@@ -1,0 +1,262 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+.kb{padding:1rem 0;max-width:460px;margin:0 auto;font-family:var(--font-sans);}
+
+.kb-header{display:flex;align-items:center;justify-content:space-between;padding:0 2px;margin-bottom:1rem;}
+.kb-brand{display:flex;align-items:center;gap:9px;}
+.kb-icon{width:32px;height:32px;background:#1D9E75;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.kb-icon svg{width:17px;height:17px;}
+.kb-name{font-size:16px;font-weight:500;color:var(--color-text-primary);}
+.kb-pill{font-size:12px;color:var(--color-text-secondary);background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:99px;padding:4px 12px;}
+
+.kb-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:1rem;}
+.kb-stat{background:var(--color-background-secondary);border-radius:var(--border-radius-lg);padding:14px 12px;}
+.kb-stat-l{font-size:11px;color:var(--color-text-tertiary);margin-bottom:4px;}
+.kb-stat-v{font-size:18px;font-weight:500;}
+.c-in{color:#0F6E56;} .c-ex{color:#993C1D;} .c-bp{color:#185FA5;} .c-bn{color:#A32D2D;}
+
+.kb-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-radius:var(--border-radius-lg);overflow:hidden;border:0.5px solid var(--color-border-tertiary);margin-bottom:1rem;}
+.kb-tab{padding:10px 4px;font-size:13px;font-weight:500;text-align:center;cursor:pointer;border:none;background:var(--color-background-secondary);color:var(--color-text-tertiary);border-right:0.5px solid var(--color-border-tertiary);}
+.kb-tab:last-child{border-right:none;}
+.kb-tab.on-in{background:#E1F5EE;color:#085041;}
+.kb-tab.on-ex{background:#FAECE7;color:#712B13;}
+.kb-tab.on-ls{background:var(--color-background-primary);color:var(--color-text-primary);}
+
+.kb-panel{display:none;}
+.kb-panel.on{display:block;}
+
+.kb-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1.25rem;margin-bottom:1rem;}
+.kb-lbl{font-size:11px;letter-spacing:.05em;color:var(--color-text-tertiary);margin-bottom:5px;}
+.kb-amt-wrap{position:relative;margin-bottom:12px;}
+.kb-yen{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:20px;font-weight:500;color:var(--color-text-secondary);pointer-events:none;}
+
+input.kb-amt{width:100%;padding:14px 14px 14px 38px;font-size:24px;font-weight:500;border:1.5px solid var(--color-text-primary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);outline:none;-moz-appearance:textfield;}
+input.kb-amt::-webkit-inner-spin-button,input.kb-amt::-webkit-outer-spin-button{-webkit-appearance:none;}
+input.kb-amt:focus{border-color:#1D9E75;box-shadow:0 0 0 3px #E1F5EE;}
+input.kb-amt.ex:focus{border-color:#D85A30;box-shadow:0 0 0 3px #FAECE7;}
+
+input.kb-desc{width:100%;padding:10px 14px;font-size:14px;border:1.5px solid var(--color-text-primary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);outline:none;margin-bottom:10px;}
+input.kb-desc:focus{border-color:#1D9E75;box-shadow:0 0 0 3px #E1F5EE;}
+input.kb-desc.ex:focus{border-color:#D85A30;box-shadow:0 0 0 3px #FAECE7;}
+
+select.kb-sel{width:100%;padding:10px 14px;font-size:14px;border:1.5px solid var(--color-text-primary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);outline:none;margin-bottom:14px;}
+
+button.kb-submit{width:100%;padding:13px;border:none;border-radius:var(--border-radius-md);font-size:15px;font-weight:500;cursor:pointer;letter-spacing:.02em;}
+button.kb-submit.in{background:#1D9E75;color:#fff;}
+button.kb-submit.in:hover{background:#0F6E56;}
+button.kb-submit.ex{background:#D85A30;color:#fff;}
+button.kb-submit.ex:hover{background:#993C1D;}
+
+.kb-sub{font-size:11px;letter-spacing:.05em;color:var(--color-text-tertiary);margin-bottom:8px;}
+.kb-cats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:1rem;}
+.kb-cat{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:12px 14px;}
+.kb-cat-top{display:flex;align-items:center;gap:7px;margin-bottom:6px;}
+.kb-cat-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.kb-cat-nm{font-size:13px;color:var(--color-text-secondary);flex:1;}
+.kb-cat-pc{font-size:11px;color:var(--color-text-tertiary);}
+.kb-cat-v{font-size:17px;font-weight:500;color:var(--color-text-primary);margin-bottom:7px;}
+.kb-bar-bg{height:3px;border-radius:99px;background:var(--color-background-secondary);}
+.kb-bar-fg{height:3px;border-radius:99px;}
+
+.kb-chart-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1.25rem;margin-bottom:1rem;}
+.kb-chart-title{font-size:11px;letter-spacing:.05em;color:var(--color-text-tertiary);margin-bottom:10px;}
+.kb-legend{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px;}
+.kb-legend-item{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--color-text-secondary);}
+.kb-legend-sq{width:9px;height:9px;border-radius:2px;flex-shrink:0;}
+.kb-chart-wrap{position:relative;width:100%;height:180px;}
+
+.kb-rows{display:flex;flex-direction:column;gap:6px;}
+.kb-row{display:flex;align-items:center;gap:11px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:11px 13px;}
+.kb-row-ic{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0;}
+.kb-row-info{flex:1;min-width:0;}
+.kb-row-desc{font-size:14px;font-weight:500;color:var(--color-text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.kb-row-cat{font-size:11px;color:var(--color-text-tertiary);margin-top:1px;}
+.kb-row-r{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.kb-row-ain{font-size:14px;font-weight:500;color:#0F6E56;}
+.kb-row-aex{font-size:14px;font-weight:500;color:#993C1D;}
+.kb-del{background:none;border:none;cursor:pointer;color:var(--color-text-tertiary);font-size:17px;line-height:1;padding:0;width:18px;text-align:center;}
+.kb-del:hover{color:#D85A30;}
+.kb-empty{text-align:center;padding:2rem 0;font-size:13px;color:var(--color-text-tertiary);}
+</style>
+
+<h2 class="sr-only">家計簿アプリ — カテゴリ別収支管理とグラフ表示</h2>
+
+<div class="kb">
+  <div class="kb-header">
+    <div class="kb-brand">
+      <div class="kb-icon">
+        <svg viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="1" y="10" width="3.5" height="6" rx="1.2" fill="white" opacity=".65"/>
+          <rect x="6.5" y="6" width="3.5" height="10" rx="1.2" fill="white" opacity=".82"/>
+          <rect x="12" y="2" width="3.5" height="14" rx="1.2" fill="white"/>
+        </svg>
+      </div>
+      <span class="kb-name">家計簿</span>
+    </div>
+    <span class="kb-pill" id="kb-date"></span>
+  </div>
+
+  <div class="kb-summary">
+    <div class="kb-stat"><div class="kb-stat-l">収入</div><div class="kb-stat-v c-in" id="s-in">¥0</div></div>
+    <div class="kb-stat"><div class="kb-stat-l">支出</div><div class="kb-stat-v c-ex" id="s-ex">¥0</div></div>
+    <div class="kb-stat"><div class="kb-stat-l">残高</div><div class="kb-stat-v c-bp" id="s-bal">¥0</div></div>
+  </div>
+
+  <div class="kb-tabs">
+    <button class="kb-tab on-in" onclick="switchTab('income')">収入を追加</button>
+    <button class="kb-tab" onclick="switchTab('expense')">支出を追加</button>
+    <button class="kb-tab" onclick="switchTab('list')">明細一覧</button>
+  </div>
+
+  <div class="kb-panel on" id="panel-income">
+    <div class="kb-card">
+      <div class="kb-lbl">金額</div>
+      <div class="kb-amt-wrap">
+        <span class="kb-yen">¥</span>
+        <input class="kb-amt" type="number" id="in-amt" placeholder="0" min="0" step="100"/>
+      </div>
+      <div class="kb-lbl">内容</div>
+      <input class="kb-desc" type="text" id="in-desc" placeholder="例：給与、ボーナス…"/>
+      <div class="kb-lbl">カテゴリ</div>
+      <select class="kb-sel" id="in-cat">
+        <option>給与</option><option>副業</option><option>ボーナス</option><option>その他</option>
+      </select>
+      <button class="kb-submit in" onclick="addEntry('income')">収入を記録する</button>
+    </div>
+    <div class="kb-sub">収入カテゴリ</div>
+    <div class="kb-cats" id="in-cats"></div>
+    <div class="kb-chart-card" id="in-chart-wrap" style="display:none;">
+      <div class="kb-chart-title">収入 カテゴリ別内訳</div>
+      <div class="kb-legend" id="in-legend"></div>
+      <div class="kb-chart-wrap"><canvas id="in-chart" role="img" aria-label="収入カテゴリ別棒グラフ"></canvas></div>
+    </div>
+  </div>
+
+  <div class="kb-panel" id="panel-expense">
+    <div class="kb-card">
+      <div class="kb-lbl">金額</div>
+      <div class="kb-amt-wrap">
+        <span class="kb-yen">¥</span>
+        <input class="kb-amt ex" type="number" id="ex-amt" placeholder="0" min="0" step="100"/>
+      </div>
+      <div class="kb-lbl">内容</div>
+      <input class="kb-desc ex" type="text" id="ex-desc" placeholder="例：スーパー、電気代…"/>
+      <div class="kb-lbl">カテゴリ</div>
+      <select class="kb-sel" id="ex-cat">
+        <option>食費</option><option>交通費</option><option>光熱費</option><option>住居費</option><option>娯楽</option><option>医療</option><option>その他</option>
+      </select>
+      <button class="kb-submit ex" onclick="addEntry('expense')">支出を記録する</button>
+    </div>
+    <div class="kb-sub">支出カテゴリ</div>
+    <div class="kb-cats" id="ex-cats"></div>
+    <div class="kb-chart-card" id="ex-chart-wrap" style="display:none;">
+      <div class="kb-chart-title">支出 カテゴリ別内訳</div>
+      <div class="kb-legend" id="ex-legend"></div>
+      <div class="kb-chart-wrap"><canvas id="ex-chart" role="img" aria-label="支出カテゴリ別棒グラフ"></canvas></div>
+    </div>
+  </div>
+
+  <div class="kb-panel" id="panel-list">
+    <div class="kb-rows" id="kb-list"></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const CC={'給与':'#1D9E75','副業':'#5DCAA5','ボーナス':'#9FE1CB','食費':'#D85A30','交通費':'#EF9F27','光熱費':'#E24B4A','住居費':'#378ADD','娯楽':'#7F77DD','医療':'#D4537E','その他':'#888780'};
+const CB={'給与':'#E1F5EE','副業':'#E1F5EE','ボーナス':'#E1F5EE','食費':'#FAECE7','交通費':'#FAEEDA','光熱費':'#FCEBEB','住居費':'#E6F1FB','娯楽':'#EEEDFE','医療':'#FBEAF0','その他':'#F1EFE8'};
+const ABBR={'給与':'給','副業':'副','ボーナス':'賞','食費':'食','交通費':'交','光熱費':'光','住居費':'住','娯楽':'楽','医療':'医','その他':'他'};
+let entries=[
+  {type:'income',desc:'給与',amount:280000,cat:'給与',id:1},
+  {type:'expense',desc:'家賃',amount:80000,cat:'住居費',id:2},
+  {type:'expense',desc:'スーパー',amount:32000,cat:'食費',id:3},
+  {type:'expense',desc:'電気・ガス',amount:8500,cat:'光熱費',id:4},
+  {type:'expense',desc:'交通IC',amount:12000,cat:'交通費',id:5},
+  {type:'income',desc:'副業',amount:45000,cat:'副業',id:6},
+  {type:'expense',desc:'映画・外食',amount:18000,cat:'娯楽',id:7},
+];
+let nid=10;
+let charts={};
+const fmt=n=>'¥'+Math.round(n).toLocaleString('ja-JP');
+
+function switchTab(t){
+  ['income','expense','list'].forEach(x=>document.getElementById('panel-'+x).classList.toggle('on',x===t));
+  const tabs=document.querySelectorAll('.kb-tab');
+  tabs[0].className='kb-tab'+(t==='income'?' on-in':'');
+  tabs[1].className='kb-tab'+(t==='expense'?' on-ex':'');
+  tabs[2].className='kb-tab'+(t==='list'?' on-ls':'');
+}
+
+function addEntry(type){
+  const aId=type==='income'?'in-amt':'ex-amt';
+  const dId=type==='income'?'in-desc':'ex-desc';
+  const cId=type==='income'?'in-cat':'ex-cat';
+  const amt=parseFloat(document.getElementById(aId).value);
+  const desc=document.getElementById(dId).value.trim();
+  if(!desc||!amt||amt<=0)return;
+  entries.push({type,desc,amount:amt,cat:document.getElementById(cId).value,id:nid++});
+  document.getElementById(aId).value='';
+  document.getElementById(dId).value='';
+  render();
+}
+
+function delEntry(id){entries=entries.filter(e=>e.id!==id);render();}
+
+function makeCats(type,catsId,chartWrapperId,legendId,chartId){
+  const rel=entries.filter(e=>e.type===type);
+  const total=rel.reduce((s,e)=>s+e.amount,0);
+  const by={};
+  rel.forEach(e=>{by[e.cat]=(by[e.cat]||0)+e.amount;});
+  const pairs=Object.entries(by).sort((a,b)=>b[1]-a[1]);
+  const catsEl=document.getElementById(catsId);
+  if(!pairs.length){
+    catsEl.innerHTML='<div style="grid-column:span 2;font-size:13px;color:var(--color-text-tertiary);text-align:center;padding:1.5rem 0;">まだ記録がありません</div>';
+    document.getElementById(chartWrapperId).style.display='none';
+    return;
+  }
+  catsEl.innerHTML=pairs.map(([cat,amt])=>{
+    const pct=total>0?Math.round(amt/total*100):0;
+    const col=CC[cat]||'#888780';
+    return `<div class="kb-cat"><div class="kb-cat-top"><div class="kb-cat-dot" style="background:${col}"></div><span class="kb-cat-nm">${cat}</span><span class="kb-cat-pc">${pct}%</span></div><div class="kb-cat-v">${fmt(amt)}</div><div class="kb-bar-bg"><div class="kb-bar-fg" style="width:${pct}%;background:${col}"></div></div></div>`;
+  }).join('');
+  document.getElementById(chartWrapperId).style.display='block';
+  const labels=pairs.map(p=>p[0]);
+  const data=pairs.map(p=>p[1]);
+  const colors=labels.map(l=>CC[l]||'#888780');
+  document.getElementById(legendId).innerHTML=labels.map((l,i)=>`<span class="kb-legend-item"><span class="kb-legend-sq" style="background:${colors[i]}"></span>${l}</span>`).join('');
+  const ctx=document.getElementById(chartId);
+  if(charts[chartId])charts[chartId].destroy();
+  charts[chartId]=new Chart(ctx,{
+    type:'bar',
+    data:{labels,datasets:[{label:'金額',data,backgroundColor:colors,borderRadius:5,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmt(c.parsed.y)}}},scales:{x:{grid:{display:false},ticks:{color:'#888780',font:{size:11},autoSkip:false,maxRotation:0}},y:{grid:{color:'rgba(128,128,128,0.1)'},beginAtZero:true,ticks:{color:'#888780',font:{size:10},callback:v=>'¥'+(v>=10000?Math.round(v/1000)+'k':v)}}}}
+  });
+}
+
+function render(){
+  const d=new Date();
+  document.getElementById('kb-date').textContent=d.getFullYear()+'年'+(d.getMonth()+1)+'月';
+  const inc=entries.filter(e=>e.type==='income').reduce((s,e)=>s+e.amount,0);
+  const exp=entries.filter(e=>e.type==='expense').reduce((s,e)=>s+e.amount,0);
+  const bal=inc-exp;
+  document.getElementById('s-in').textContent=fmt(inc);
+  document.getElementById('s-ex').textContent=fmt(exp);
+  const bEl=document.getElementById('s-bal');
+  bEl.textContent=fmt(Math.abs(bal));
+  bEl.className='kb-stat-v '+(bal>=0?'c-bp':'c-bn');
+  makeCats('income','in-cats','in-chart-wrap','in-legend','in-chart');
+  makeCats('expense','ex-cats','ex-chart-wrap','ex-legend','ex-chart');
+  const list=document.getElementById('kb-list');
+  if(!entries.length){list.innerHTML='<div class="kb-empty">まだ記録がありません</div>';return;}
+  list.innerHTML=[...entries].reverse().map(e=>{
+    const isIn=e.type==='income';
+    const col=CC[e.cat]||'#888780';
+    const bg=CB[e.cat]||'#F1EFE8';
+    const ab=ABBR[e.cat]||'他';
+    return `<div class="kb-row"><div class="kb-row-ic" style="background:${bg};color:${col};">${ab}</div><div class="kb-row-info"><div class="kb-row-desc">${e.desc}</div><div class="kb-row-cat">${e.cat}</div></div><div class="kb-row-r"><span class="${isIn?'kb-row-ain':'kb-row-aex'}">${isIn?'+':'-'}${fmt(e.amount)}</span><button class="kb-del" onclick="delEntry(${e.id})">×</button></div></div>`;
+  }).join('');
+}
+render();
+</script>
