@@ -29,22 +29,19 @@ body,html{font-size:16px;}
 .kb-panel{display:none;}
 .kb-panel.on{display:block;}
 
-.kb-card{background:var(--color-background-primary);border:1px solid #888;border-radius:14px;padding:1.5rem;margin-bottom:1.25rem;}
+.kb-card{background:var(--color-background-primary);border:1px solid var(--color-border-secondary);border-radius:14px;padding:1.5rem;margin-bottom:1.25rem;}
 .kb-lbl{font-size:13px;font-weight:500;letter-spacing:.03em;color:var(--color-text-secondary);margin-bottom:8px;}
 
 .kb-amt-wrap{position:relative;margin-bottom:16px;}
 .kb-yen{position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:22px;font-weight:500;color:var(--color-text-secondary);pointer-events:none;z-index:1;}
-input.kb-amt{width:100%;padding:18px 16px 18px 42px;font-size:28px;font-weight:500;border:2px solid #333;border-radius:10px;background:var(--color-background-primary);color:var(--color-text-primary);outline:none;-moz-appearance:textfield;-webkit-appearance:none;appearance:none;}
+input.kb-amt{width:100%;padding:18px 16px 18px 42px;font-size:28px;font-weight:500;border:2px solid #555;border-radius:10px;background:var(--color-background-primary);color:var(--color-text-primary);outline:none;-moz-appearance:textfield;-webkit-appearance:none;appearance:none;}
 input.kb-amt::-webkit-inner-spin-button,input.kb-amt::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
 input.kb-amt:focus{border-color:#1D9E75;box-shadow:0 0 0 4px rgba(29,158,117,0.15);}
 input.kb-amt.ex:focus{border-color:#D85A30;box-shadow:0 0 0 4px rgba(216,90,48,0.15);}
-
-input.kb-desc{width:100%;padding:14px 16px;font-size:16px;border:2px solid #333;border-radius:10px;background:var(--color-background-primary);color:var(--color-text-primary);outline:none;margin-bottom:14px;-webkit-appearance:none;appearance:none;}
+input.kb-desc{width:100%;padding:14px 16px;font-size:16px;border:2px solid #555;border-radius:10px;background:var(--color-background-primary);color:var(--color-text-primary);outline:none;margin-bottom:14px;-webkit-appearance:none;appearance:none;}
 input.kb-desc:focus{border-color:#1D9E75;box-shadow:0 0 0 4px rgba(29,158,117,0.15);}
 input.kb-desc.ex:focus{border-color:#D85A30;box-shadow:0 0 0 4px rgba(216,90,48,0.15);}
-
-select.kb-sel{width:100%;padding:14px 16px;font-size:16px;border:2px solid #333;border-radius:10px;background:var(--color-background-primary);color:var(--color-text-primary);outline:none;margin-bottom:18px;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center;}
-select.kb-sel:focus{border-color:#1D9E75;}
+select.kb-sel{width:100%;padding:14px 16px;font-size:16px;border:2px solid #555;border-radius:10px;background:var(--color-background-primary);color:var(--color-text-primary);outline:none;margin-bottom:18px;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center;}
 
 button.kb-submit{width:100%;padding:16px;border:none;border-radius:12px;font-size:16px;font-weight:500;cursor:pointer;letter-spacing:.02em;-webkit-tap-highlight-color:transparent;}
 button.kb-submit.in{background:#1D9E75;color:#fff;}
@@ -81,7 +78,10 @@ button.kb-submit.ex:active{background:#993C1D;}
 .kb-row-aex{font-size:15px;font-weight:500;color:#993C1D;}
 .kb-del{background:none;border:none;cursor:pointer;color:var(--color-text-tertiary);font-size:20px;line-height:1;padding:4px;-webkit-tap-highlight-color:transparent;}
 .kb-del:active{color:#D85A30;}
-.kb-empty{text-align:center;padding:2.5rem 0;font-size:15px;color:var(--color-text-tertiary);}
+.kb-empty{text-align:center;padding:3rem 0;font-size:15px;color:var(--color-text-tertiary);line-height:2;}
+
+.kb-save-msg{font-size:12px;color:#0F6E56;text-align:center;padding:6px 0;opacity:0;transition:opacity 0.3s;}
+.kb-save-msg.show{opacity:1;}
 </style>
 
 <h2 class="sr-only">家計簿アプリ — カテゴリ別収支管理とグラフ表示</h2>
@@ -164,109 +164,143 @@ button.kb-submit.ex:active{background:#993C1D;}
   <div class="kb-panel" id="panel-list">
     <div class="kb-rows" id="kb-list"></div>
   </div>
+
+  <div class="kb-save-msg" id="save-msg">保存しました</div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
+const STORAGE_KEY = 'kakeibo_entries_v1';
 const CC={'給与':'#1D9E75','副業':'#5DCAA5','ボーナス':'#9FE1CB','食費':'#D85A30','交通費':'#EF9F27','光熱費':'#E24B4A','住居費':'#378ADD','娯楽':'#7F77DD','医療':'#D4537E','その他':'#888780'};
 const CB={'給与':'#E1F5EE','副業':'#E1F5EE','ボーナス':'#E1F5EE','食費':'#FAECE7','交通費':'#FAEEDA','光熱費':'#FCEBEB','住居費':'#E6F1FB','娯楽':'#EEEDFE','医療':'#FBEAF0','その他':'#F1EFE8'};
 const ABBR={'給与':'給','副業':'副','ボーナス':'賞','食費':'食','交通費':'交','光熱費':'光','住居費':'住','娯楽':'楽','医療':'医','その他':'他'};
-let entries=[
-  {type:'income',desc:'給与',amount:280000,cat:'給与',id:1},
-  {type:'expense',desc:'家賃',amount:80000,cat:'住居費',id:2},
-  {type:'expense',desc:'スーパー',amount:32000,cat:'食費',id:3},
-  {type:'expense',desc:'電気・ガス',amount:8500,cat:'光熱費',id:4},
-  {type:'expense',desc:'交通IC',amount:12000,cat:'交通費',id:5},
-  {type:'income',desc:'副業',amount:45000,cat:'副業',id:6},
-  {type:'expense',desc:'映画・外食',amount:18000,cat:'娯楽',id:7},
-];
-let nid=10;
-let charts={};
-const fmt=n=>'¥'+Math.round(n).toLocaleString('ja-JP');
 
-function switchTab(t){
-  ['income','expense','list'].forEach(x=>document.getElementById('panel-'+x).classList.toggle('on',x===t));
-  const tabs=document.querySelectorAll('.kb-tab');
-  tabs[0].className='kb-tab'+(t==='income'?' on-in':'');
-  tabs[1].className='kb-tab'+(t==='expense'?' on-ex':'');
-  tabs[2].className='kb-tab'+(t==='list'?' on-ls':'');
+let entries = [];
+let nid = 1;
+let charts = {};
+let saveTimer = null;
+
+function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      entries = parsed.entries || [];
+      nid = parsed.nid || (entries.length ? Math.max(...entries.map(e=>e.id)) + 1 : 1);
+    }
+  } catch(e) {
+    entries = [];
+    nid = 1;
+  }
 }
 
-function addEntry(type){
-  const aId=type==='income'?'in-amt':'ex-amt';
-  const dId=type==='income'?'in-desc':'ex-desc';
-  const cId=type==='income'?'in-cat':'ex-cat';
-  const amt=parseFloat(document.getElementById(aId).value);
-  const desc=document.getElementById(dId).value.trim();
-  if(!desc||!amt||amt<=0)return;
-  entries.push({type,desc,amount:amt,cat:document.getElementById(cId).value,id:nid++});
-  document.getElementById(aId).value='';
-  document.getElementById(dId).value='';
+function saveData() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ entries, nid }));
+    const msg = document.getElementById('save-msg');
+    msg.classList.add('show');
+    if (saveTimer) clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => msg.classList.remove('show'), 1800);
+  } catch(e) {}
+}
+
+const fmt = n => '¥' + Math.round(n).toLocaleString('ja-JP');
+
+function switchTab(t) {
+  ['income','expense','list'].forEach(x => document.getElementById('panel-'+x).classList.toggle('on', x===t));
+  const tabs = document.querySelectorAll('.kb-tab');
+  tabs[0].className = 'kb-tab' + (t==='income' ? ' on-in' : '');
+  tabs[1].className = 'kb-tab' + (t==='expense' ? ' on-ex' : '');
+  tabs[2].className = 'kb-tab' + (t==='list' ? ' on-ls' : '');
+}
+
+function addEntry(type) {
+  const aId = type==='income' ? 'in-amt' : 'ex-amt';
+  const dId = type==='income' ? 'in-desc' : 'ex-desc';
+  const cId = type==='income' ? 'in-cat' : 'ex-cat';
+  const amt = parseFloat(document.getElementById(aId).value);
+  const desc = document.getElementById(dId).value.trim();
+  if (!desc || !amt || amt <= 0) return;
+  entries.push({ type, desc, amount: amt, cat: document.getElementById(cId).value, id: nid++ });
+  document.getElementById(aId).value = '';
+  document.getElementById(dId).value = '';
+  saveData();
   render();
 }
 
-function delEntry(id){entries=entries.filter(e=>e.id!==id);render();}
+function delEntry(id) {
+  entries = entries.filter(e => e.id !== id);
+  saveData();
+  render();
+}
 
-function makeCats(type,catsId,chartWrapperId,legendId,chartId){
-  const rel=entries.filter(e=>e.type===type);
-  const total=rel.reduce((s,e)=>s+e.amount,0);
-  const by={};
-  rel.forEach(e=>{by[e.cat]=(by[e.cat]||0)+e.amount;});
-  const pairs=Object.entries(by).sort((a,b)=>b[1]-a[1]);
-  const catsEl=document.getElementById(catsId);
-  if(!pairs.length){
-    catsEl.innerHTML='<div style="grid-column:span 2;font-size:14px;color:var(--color-text-tertiary);text-align:center;padding:2rem 0;">まだ記録がありません</div>';
-    document.getElementById(chartWrapperId).style.display='none';
+function makeCats(type, catsId, chartWrapperId, legendId, chartId) {
+  const rel = entries.filter(e => e.type===type);
+  const total = rel.reduce((s,e) => s+e.amount, 0);
+  const by = {};
+  rel.forEach(e => { by[e.cat] = (by[e.cat]||0) + e.amount; });
+  const pairs = Object.entries(by).sort((a,b) => b[1]-a[1]);
+  const catsEl = document.getElementById(catsId);
+  if (!pairs.length) {
+    catsEl.innerHTML = '<div style="grid-column:span 2;font-size:14px;color:var(--color-text-tertiary);text-align:center;padding:2rem 0;">まだ記録がありません</div>';
+    document.getElementById(chartWrapperId).style.display = 'none';
     return;
   }
-  catsEl.innerHTML=pairs.map(([cat,amt])=>{
-    const pct=total>0?Math.round(amt/total*100):0;
-    const col=CC[cat]||'#888780';
+  catsEl.innerHTML = pairs.map(([cat,amt]) => {
+    const pct = total>0 ? Math.round(amt/total*100) : 0;
+    const col = CC[cat]||'#888780';
     return `<div class="kb-cat"><div class="kb-cat-top"><div class="kb-cat-dot" style="background:${col}"></div><span class="kb-cat-nm">${cat}</span><span class="kb-cat-pc">${pct}%</span></div><div class="kb-cat-v">${fmt(amt)}</div><div class="kb-bar-bg"><div class="kb-bar-fg" style="width:${pct}%;background:${col}"></div></div></div>`;
   }).join('');
-  document.getElementById(chartWrapperId).style.display='block';
-  const labels=pairs.map(p=>p[0]);
-  const data=pairs.map(p=>p[1]);
-  const colors=labels.map(l=>CC[l]||'#888780');
-  document.getElementById(legendId).innerHTML=labels.map((l,i)=>`<span class="kb-legend-item"><span class="kb-legend-sq" style="background:${colors[i]}"></span>${l}</span>`).join('');
-  const ctx=document.getElementById(chartId);
-  if(charts[chartId])charts[chartId].destroy();
-  charts[chartId]=new Chart(ctx,{
+  document.getElementById(chartWrapperId).style.display = 'block';
+  const labels = pairs.map(p=>p[0]);
+  const data = pairs.map(p=>p[1]);
+  const colors = labels.map(l => CC[l]||'#888780');
+  document.getElementById(legendId).innerHTML = labels.map((l,i) =>
+    `<span class="kb-legend-item"><span class="kb-legend-sq" style="background:${colors[i]}"></span>${l}</span>`
+  ).join('');
+  const ctx = document.getElementById(chartId);
+  if (charts[chartId]) charts[chartId].destroy();
+  charts[chartId] = new Chart(ctx, {
     type:'bar',
-    data:{labels,datasets:[{label:'金額',data,backgroundColor:colors,borderRadius:6,borderSkipped:false}]},
+    data:{ labels, datasets:[{ label:'金額', data, backgroundColor:colors, borderRadius:6, borderSkipped:false }] },
     options:{
-      responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmt(c.parsed.y)}}},
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{callbacks:{label:c=>fmt(c.parsed.y)}} },
       scales:{
-        x:{grid:{display:false},ticks:{color:'#888780',font:{size:12},autoSkip:false,maxRotation:0}},
-        y:{grid:{color:'rgba(128,128,128,0.1)'},beginAtZero:true,ticks:{color:'#888780',font:{size:11},callback:v=>'¥'+(v>=10000?Math.round(v/1000)+'k':v)}}
+        x:{ grid:{display:false}, ticks:{color:'#888780',font:{size:12},autoSkip:false,maxRotation:0} },
+        y:{ grid:{color:'rgba(128,128,128,0.1)'}, beginAtZero:true, ticks:{color:'#888780',font:{size:11},callback:v=>'¥'+(v>=10000?Math.round(v/1000)+'k':v)} }
       }
     }
   });
 }
 
-function render(){
-  const d=new Date();
-  document.getElementById('kb-date').textContent=d.getFullYear()+'年'+(d.getMonth()+1)+'月';
-  const inc=entries.filter(e=>e.type==='income').reduce((s,e)=>s+e.amount,0);
-  const exp=entries.filter(e=>e.type==='expense').reduce((s,e)=>s+e.amount,0);
-  const bal=inc-exp;
-  document.getElementById('s-in').textContent=fmt(inc);
-  document.getElementById('s-ex').textContent=fmt(exp);
-  const bEl=document.getElementById('s-bal');
-  bEl.textContent=fmt(Math.abs(bal));
-  bEl.className='kb-stat-v '+(bal>=0?'c-bp':'c-bn');
+function render() {
+  const d = new Date();
+  document.getElementById('kb-date').textContent = d.getFullYear()+'年'+(d.getMonth()+1)+'月';
+  const inc = entries.filter(e=>e.type==='income').reduce((s,e)=>s+e.amount,0);
+  const exp = entries.filter(e=>e.type==='expense').reduce((s,e)=>s+e.amount,0);
+  const bal = inc - exp;
+  document.getElementById('s-in').textContent = fmt(inc);
+  document.getElementById('s-ex').textContent = fmt(exp);
+  const bEl = document.getElementById('s-bal');
+  bEl.textContent = fmt(Math.abs(bal));
+  bEl.className = 'kb-stat-v ' + (bal>=0 ? 'c-bp' : 'c-bn');
   makeCats('income','in-cats','in-chart-wrap','in-legend','in-chart');
   makeCats('expense','ex-cats','ex-chart-wrap','ex-legend','ex-chart');
-  const list=document.getElementById('kb-list');
-  if(!entries.length){list.innerHTML='<div class="kb-empty">まだ記録がありません</div>';return;}
-  list.innerHTML=[...entries].reverse().map(e=>{
-    const isIn=e.type==='income';
-    const col=CC[e.cat]||'#888780';
-    const bg=CB[e.cat]||'#F1EFE8';
-    const ab=ABBR[e.cat]||'他';
+  const list = document.getElementById('kb-list');
+  if (!entries.length) {
+    list.innerHTML = '<div class="kb-empty">まだ記録がありません<br>収入・支出を追加してみましょう</div>';
+    return;
+  }
+  list.innerHTML = [...entries].reverse().map(e => {
+    const isIn = e.type==='income';
+    const col = CC[e.cat]||'#888780';
+    const bg = CB[e.cat]||'#F1EFE8';
+    const ab = ABBR[e.cat]||'他';
     return `<div class="kb-row"><div class="kb-row-ic" style="background:${bg};color:${col};">${ab}</div><div class="kb-row-info"><div class="kb-row-desc">${e.desc}</div><div class="kb-row-cat">${e.cat}</div></div><div class="kb-row-r"><span class="${isIn?'kb-row-ain':'kb-row-aex'}">${isIn?'+':'-'}${fmt(e.amount)}</span><button class="kb-del" onclick="delEntry(${e.id})">×</button></div></div>`;
   }).join('');
 }
+
+loadData();
 render();
 </script>
