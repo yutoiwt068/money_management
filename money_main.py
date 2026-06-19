@@ -1,4 +1,5 @@
 """
+ERモデルメモ
 ユーザー_user
     アカウント id
         google google_id
@@ -17,14 +18,18 @@
                                 終了時間 up
                             その他 other_income
 """
+
 from datetime import date
 
 from project import Project
 from transaction import Transaction
 from transaction import TransactionType
 
+# メイン処理
 def main():
     june = Project("2026/6")
+
+# ここは動作確認
 
     june.add_transaction(
         Transaction(

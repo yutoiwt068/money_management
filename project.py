@@ -1,18 +1,22 @@
-from app.money_management.money_management.transaction import Transaction
+from transaction import Transaction
+
+# お金の収支に関する管理を行うクラス
 
 class Project:
     def __init__(self,name):
         self.name=name
         self.transactions = []
 
+    # 新しい履歴を追加する関数
     def add_transaction(self, transaction):
         self.transactions.append(transaction)
 
+    # 履歴を削除する関数
     def remove_transaction(self, index):
         del self.transactions[index]
 
 
-
+    # 収入の和を算出する関数
     def get_income_total(self):
         total = 0
         
@@ -22,6 +26,7 @@ class Project:
 
         return total
     
+    # 支出の和を算出する関数
     def get_expense_total(self):
         total = 0
 
@@ -31,6 +36,7 @@ class Project:
 
         return total
     
+    # 収支を算出する関数
     def get_balance(self):
         return (self.get_income_total() - self.get_expense_total())
     
