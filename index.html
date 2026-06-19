@@ -1,4 +1,3 @@
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,'Hiragino Sans','Hiragino Kaku Gothic ProN','Noto Sans JP','Yu Gothic UI',sans-serif;}
@@ -18,11 +17,12 @@
 .kb-stat-v{font-size:20px;font-weight:500;}
 .c-in{color:#0F6E56;}.c-ex{color:#993C1D;}.c-bp{color:#185FA5;}.c-bn{color:#A32D2D;}
 
-.kb-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-radius:14px;overflow:hidden;border:1px solid var(--color-border-secondary);margin-bottom:1.25rem;}
-.kb-tab{padding:13px 4px;font-size:14px;font-weight:500;text-align:center;cursor:pointer;border:none;background:var(--color-background-secondary);color:var(--color-text-tertiary);border-right:1px solid var(--color-border-secondary);}
+.kb-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-radius:14px;overflow:hidden;border:1px solid var(--color-border-secondary);margin-bottom:1.25rem;}
+.kb-tab{padding:13px 4px;font-size:13px;font-weight:500;text-align:center;cursor:pointer;border:none;background:var(--color-background-secondary);color:var(--color-text-tertiary);border-right:1px solid var(--color-border-secondary);-webkit-tap-highlight-color:transparent;font-family:inherit;}
 .kb-tab:last-child{border-right:none;}
 .kb-tab.on-in{background:#E1F5EE;color:#085041;}
 .kb-tab.on-ex{background:#FAECE7;color:#712B13;}
+.kb-tab.on-cal{background:#E6F1FB;color:#0C447C;}
 .kb-tab.on-ls{background:var(--color-background-primary);color:var(--color-text-primary);}
 
 .kb-panel{display:none;}
@@ -41,6 +41,10 @@ input.kb-amt.ex:focus{border-color:#D85A30;box-shadow:0 0 0 4px rgba(216,90,48,0
 input.kb-desc{width:100%;padding:14px 16px;font-size:16px;border:2px solid #555;border-radius:10px;background:var(--color-background-primary);color:var(--color-text-primary);outline:none;margin-bottom:14px;-webkit-appearance:none;appearance:none;font-family:inherit;}
 input.kb-desc:focus{border-color:#1D9E75;box-shadow:0 0 0 4px rgba(29,158,117,0.15);}
 input.kb-desc.ex:focus{border-color:#D85A30;box-shadow:0 0 0 4px rgba(216,90,48,0.15);}
+
+input.kb-date{width:100%;padding:14px 16px;font-size:16px;border:2px solid #555;border-radius:10px;background:var(--color-background-primary);color:var(--color-text-primary);outline:none;margin-bottom:14px;-webkit-appearance:none;appearance:none;font-family:inherit;}
+input.kb-date:focus{border-color:#1D9E75;box-shadow:0 0 0 4px rgba(29,158,117,0.15);}
+input.kb-date.ex:focus{border-color:#D85A30;box-shadow:0 0 0 4px rgba(216,90,48,0.15);}
 
 select.kb-sel{width:100%;padding:14px 16px;font-size:16px;border:2px solid #555;border-radius:10px;background:var(--color-background-primary);color:var(--color-text-primary);outline:none;margin-bottom:14px;-webkit-appearance:none;appearance:none;font-family:inherit;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center;}
 
@@ -84,8 +88,10 @@ button.kb-submit.ex:active{background:#993C1D;}
 .kb-row-ic{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;flex-shrink:0;}
 .kb-row-info{flex:1;min-width:0;}
 .kb-row-desc{font-size:15px;font-weight:500;color:var(--color-text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.kb-row-meta{display:flex;align-items:center;gap:6px;margin-top:3px;}
+.kb-row-meta{display:flex;align-items:center;gap:6px;margin-top:3px;flex-wrap:wrap;}
 .kb-row-cat{font-size:12px;color:var(--color-text-tertiary);}
+.kb-row-date{font-size:12px;color:var(--color-text-tertiary);}
+.kb-row-date::before{content:"·";margin-right:6px;}
 .kb-status-tag{font-size:11px;font-weight:500;padding:2px 8px;border-radius:99px;}
 .tag-plan{background:#E6F1FB;color:#0C447C;}
 .tag-done{background:#E1F5EE;color:#085041;}
@@ -98,9 +104,45 @@ button.kb-submit.ex:active{background:#993C1D;}
 .kb-empty{text-align:center;padding:3rem 0;font-size:15px;color:var(--color-text-tertiary);line-height:2.2;}
 .kb-save-msg{font-size:12px;color:#0F6E56;text-align:center;padding:6px 0;opacity:0;transition:opacity 0.3s;}
 .kb-save-msg.show{opacity:1;}
+
+/* カレンダー */
+.kb-cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
+.kb-cal-navbtn{width:36px;height:36px;border-radius:10px;border:1px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-secondary);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;}
+.kb-cal-navbtn:active{background:var(--color-background-secondary);}
+.kb-cal-title{font-size:16px;font-weight:500;color:var(--color-text-primary);}
+.kb-cal-today{font-size:12px;color:#185FA5;background:#E6F1FB;border-radius:99px;padding:4px 12px;cursor:pointer;border:none;font-family:inherit;font-weight:500;-webkit-tap-highlight-color:transparent;}
+
+.kb-cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;margin-bottom:1rem;}
+.kb-cal-dow{text-align:center;font-size:11px;font-weight:500;color:var(--color-text-tertiary);padding:4px 0 8px;}
+.kb-cal-dow.sun{color:#A32D2D;}
+.kb-cal-dow.sat{color:#185FA5;}
+
+.kb-cal-cell{aspect-ratio:1/1;border-radius:10px;padding:4px 3px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;cursor:pointer;border:1.5px solid transparent;background:var(--color-background-secondary);-webkit-tap-highlight-color:transparent;min-width:0;}
+.kb-cal-cell.empty{visibility:hidden;cursor:default;}
+.kb-cal-cell.today{border-color:#1D9E75;}
+.kb-cal-cell.selected{background:var(--color-background-primary);border-color:#378ADD;box-shadow:0 0 0 3px rgba(55,138,221,0.15);}
+.kb-cal-daynum{font-size:12px;font-weight:500;color:var(--color-text-secondary);margin-bottom:2px;}
+.kb-cal-cell.today .kb-cal-daynum{color:#0F6E56;}
+.kb-cal-dots{display:flex;gap:2px;margin-top:auto;}
+.kb-cal-dot{width:5px;height:5px;border-radius:50%;}
+.kb-cal-dot.in{background:#1D9E75;}
+.kb-cal-dot.ex{background:#D85A30;}
+.kb-cal-dot.plan{opacity:.45;}
+.kb-cal-amt{font-size:8.5px;line-height:1.3;font-weight:500;text-align:center;}
+.kb-cal-amt.in{color:#0F6E56;}
+.kb-cal-amt.ex{color:#993C1D;}
+
+.kb-cal-legend{display:flex;gap:14px;justify-content:center;margin-bottom:1.25rem;}
+.kb-cal-legend-item{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--color-text-tertiary);}
+
+.kb-day-card{background:var(--color-background-primary);border:1px solid var(--color-border-secondary);border-radius:14px;padding:1.1rem 1.25rem;margin-bottom:1.25rem;}
+.kb-day-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem;}
+.kb-day-title{font-size:14px;font-weight:500;color:var(--color-text-primary);}
+.kb-day-sums{display:flex;gap:14px;}
+.kb-day-sum{font-size:13px;font-weight:500;}
 </style>
 
-<h2 class="sr-only">家計簿アプリ — ステータス管理付きカテゴリ別収支管理</h2>
+<h2 class="sr-only">家計簿アプリ — カレンダー連携付きステータス管理・カテゴリ別収支管理</h2>
 
 <div class="kb">
   <div class="kb-header">
@@ -124,9 +166,10 @@ button.kb-submit.ex:active{background:#993C1D;}
   </div>
 
   <div class="kb-tabs">
-    <button class="kb-tab on-in" onclick="switchTab('income')">収入を追加</button>
-    <button class="kb-tab" onclick="switchTab('expense')">支出を追加</button>
-    <button class="kb-tab" onclick="switchTab('list')">明細一覧</button>
+    <button class="kb-tab on-in" onclick="switchTab('income')">収入</button>
+    <button class="kb-tab" onclick="switchTab('expense')">支出</button>
+    <button class="kb-tab" onclick="switchTab('calendar')">カレンダー</button>
+    <button class="kb-tab" onclick="switchTab('list')">明細</button>
   </div>
 
   <!-- 収入パネル -->
@@ -139,6 +182,8 @@ button.kb-submit.ex:active{background:#993C1D;}
       </div>
       <div class="kb-lbl">内容</div>
       <input class="kb-desc" type="text" id="in-desc" placeholder="例：給与、ボーナス…"/>
+      <div class="kb-lbl">日付</div>
+      <input class="kb-date" type="date" id="in-date"/>
       <div class="kb-lbl">カテゴリ</div>
       <select class="kb-sel" id="in-cat">
         <option>給与</option><option>副業</option><option>ボーナス</option><option>その他</option>
@@ -172,6 +217,8 @@ button.kb-submit.ex:active{background:#993C1D;}
       </div>
       <div class="kb-lbl">内容</div>
       <input class="kb-desc ex" type="text" id="ex-desc" placeholder="例：スーパー、電気代…"/>
+      <div class="kb-lbl">日付</div>
+      <input class="kb-date ex" type="date" id="ex-date"/>
       <div class="kb-lbl">カテゴリ</div>
       <select class="kb-sel" id="ex-cat">
         <option>食費</option><option>交通費</option><option>光熱費</option><option>住居費</option><option>娯楽</option><option>医療</option><option>その他</option>
@@ -195,6 +242,41 @@ button.kb-submit.ex:active{background:#993C1D;}
     </div>
   </div>
 
+  <!-- カレンダーパネル -->
+  <div class="kb-panel" id="panel-calendar">
+    <div class="kb-cal-nav">
+      <button class="kb-cal-navbtn" onclick="calShift(-1)" aria-label="前の月">‹</button>
+      <span class="kb-cal-title" id="cal-title"></span>
+      <button class="kb-cal-navbtn" onclick="calShift(1)" aria-label="次の月">›</button>
+    </div>
+
+    <div class="kb-summary">
+      <div class="kb-stat"><div class="kb-stat-l">今月の収入</div><div class="kb-stat-v c-in" id="cal-m-in">¥0</div></div>
+      <div class="kb-stat"><div class="kb-stat-l">今月の支出</div><div class="kb-stat-v c-ex" id="cal-m-ex">¥0</div></div>
+      <div class="kb-stat"><div class="kb-stat-l">今月の残高</div><div class="kb-stat-v c-bp" id="cal-m-bal">¥0</div></div>
+    </div>
+
+    <div class="kb-cal-grid" id="cal-dow"></div>
+    <div class="kb-cal-grid" id="cal-grid"></div>
+    <div class="kb-cal-legend">
+      <span class="kb-cal-legend-item"><span class="kb-cal-dot in" style="display:inline-block;"></span>収入</span>
+      <span class="kb-cal-legend-item"><span class="kb-cal-dot ex" style="display:inline-block;"></span>支出</span>
+      <span class="kb-cal-legend-item"><span class="kb-cal-dot in plan" style="display:inline-block;"></span>予定（薄色）</span>
+      <button class="kb-cal-today" onclick="calGoToday()">今日</button>
+    </div>
+
+    <div class="kb-day-card">
+      <div class="kb-day-head">
+        <span class="kb-day-title" id="day-title"></span>
+        <div class="kb-day-sums">
+          <span class="kb-day-sum c-in" id="day-in">¥0</span>
+          <span class="kb-day-sum c-ex" id="day-ex">¥0</span>
+        </div>
+      </div>
+      <div class="kb-rows" id="day-list"></div>
+    </div>
+  </div>
+
   <!-- 明細パネル -->
   <div class="kb-panel" id="panel-list">
     <div class="kb-filter-row">
@@ -211,12 +293,13 @@ button.kb-submit.ex:active{background:#993C1D;}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-const STORAGE_KEY='kakeibo_entries_v2';
+const STORAGE_KEY='kakeibo_entries_v3';
 const CC={'給与':'#1D9E75','副業':'#5DCAA5','ボーナス':'#9FE1CB','食費':'#D85A30','交通費':'#EF9F27','光熱費':'#E24B4A','住居費':'#378ADD','娯楽':'#7F77DD','医療':'#D4537E','その他':'#888780'};
 const CB={'給与':'#E1F5EE','副業':'#E1F5EE','ボーナス':'#E1F5EE','食費':'#FAECE7','交通費':'#FAEEDA','光熱費':'#FCEBEB','住居費':'#E6F1FB','娯楽':'#EEEDFE','医療':'#FBEAF0','その他':'#F1EFE8'};
 const ABBR={'給与':'給','副業':'副','ボーナス':'賞','食費':'食','交通費':'交','光熱費':'光','住居費':'住','娯楽':'楽','医療':'医','その他':'他'};
 const STATUS_LABEL={plan:'予定',done:'完了',cancel:'取消'};
 const STATUS_CLS={plan:'tag-plan',done:'tag-done',cancel:'tag-cancel'};
+const DOW=['日','月','火','水','木','金','土'];
 
 let entries=[];
 let nid=1;
@@ -225,35 +308,54 @@ let saveTimer=null;
 let selectedStatus={income:'plan',expense:'plan'};
 let currentFilter='all';
 
-function loadData(){
+function todayStr(){
+  const d=new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
+let calYear, calMonth, selectedDate;
+
+async function loadData(){
   try{
-    const raw=localStorage.getItem(STORAGE_KEY);
-    if(raw){
-      const p=JSON.parse(raw);
+    const res=await window.storage.get(STORAGE_KEY);
+    if(res&&res.value){
+      const p=JSON.parse(res.value);
       entries=p.entries||[];
       nid=p.nid||(entries.length?Math.max(...entries.map(e=>e.id))+1:1);
     }
   }catch(e){entries=[];nid=1;}
+  // 日付のないレコード（旧データ）には今日の日付を割り当てる
+  let migrated=false;
+  entries.forEach(e=>{if(!e.date){e.date=todayStr();migrated=true;}});
+  if(migrated)saveData();
 }
 
-function saveData(){
+async function saveData(){
   try{
-    localStorage.setItem(STORAGE_KEY,JSON.stringify({entries,nid}));
+    const result=await window.storage.set(STORAGE_KEY,JSON.stringify({entries,nid}));
+    if(!result){console.error('保存に失敗しました');return;}
     const msg=document.getElementById('save-msg');
     msg.classList.add('show');
     if(saveTimer)clearTimeout(saveTimer);
     saveTimer=setTimeout(()=>msg.classList.remove('show'),1800);
-  }catch(e){}
+  }catch(e){console.error('Storage error:',e);}
 }
 
 const fmt=n=>'¥'+Math.round(n).toLocaleString('ja-JP');
+const fmtShort=n=>{
+  const v=Math.round(n);
+  if(v>=10000)return Math.round(v/1000)+'k';
+  return v.toLocaleString('ja-JP');
+};
 
 function switchTab(t){
-  ['income','expense','list'].forEach(x=>document.getElementById('panel-'+x).classList.toggle('on',x===t));
+  ['income','expense','calendar','list'].forEach(x=>document.getElementById('panel-'+x).classList.toggle('on',x===t));
   const tabs=document.querySelectorAll('.kb-tab');
   tabs[0].className='kb-tab'+(t==='income'?' on-in':'');
   tabs[1].className='kb-tab'+(t==='expense'?' on-ex':'');
-  tabs[2].className='kb-tab'+(t==='list'?' on-ls':'');
+  tabs[2].className='kb-tab'+(t==='calendar'?' on-cal':'');
+  tabs[3].className='kb-tab'+(t==='list'?' on-ls':'');
+  if(t==='calendar')renderCalendar();
 }
 
 function setStatus(type,status){
@@ -280,12 +382,15 @@ function addEntry(type){
   const aId=type==='income'?'in-amt':'ex-amt';
   const dId=type==='income'?'in-desc':'ex-desc';
   const cId=type==='income'?'in-cat':'ex-cat';
+  const dtId=type==='income'?'in-date':'ex-date';
   const amt=parseFloat(document.getElementById(aId).value);
   const desc=document.getElementById(dId).value.trim();
+  const date=document.getElementById(dtId).value||todayStr();
   if(!desc||!amt||amt<=0)return;
-  entries.push({type,desc,amount:amt,cat:document.getElementById(cId).value,status:selectedStatus[type],id:nid++});
+  entries.push({type,desc,amount:amt,cat:document.getElementById(cId).value,status:selectedStatus[type],date,id:nid++});
   document.getElementById(aId).value='';
   document.getElementById(dId).value='';
+  document.getElementById(dtId).value=todayStr();
   saveData();
   render();
 }
@@ -343,35 +448,162 @@ function renderList(){
     list.innerHTML='<div class="kb-empty">該当する記録がありません</div>';
     return;
   }
-  list.innerHTML=[...filtered].reverse().map(e=>{
-    const isIn=e.type==='income';
-    const col=CC[e.cat]||'#888780';
-    const bg=CB[e.cat]||'#F1EFE8';
-    const ab=ABBR[e.cat]||'他';
-    const stCls=STATUS_CLS[e.status]||'tag-plan';
-    const stLbl=STATUS_LABEL[e.status]||'予定';
-    return `<div class="kb-row">
-      <div class="kb-row-ic" style="background:${bg};color:${col};">${ab}</div>
-      <div class="kb-row-info">
-        <div class="kb-row-desc">${e.desc}</div>
-        <div class="kb-row-meta">
-          <span class="kb-row-cat">${e.cat}</span>
-          <span class="kb-status-tag ${stCls}" onclick="toggleStatus(${e.id})" style="cursor:pointer;">${stLbl}</span>
-        </div>
+  const sorted=[...filtered].sort((a,b)=>(a.date||'').localeCompare(b.date||'')||a.id-b.id).reverse();
+  list.innerHTML=sorted.map(e=>rowHtml(e)).join('');
+}
+
+function rowHtml(e){
+  const isIn=e.type==='income';
+  const col=CC[e.cat]||'#888780';
+  const bg=CB[e.cat]||'#F1EFE8';
+  const ab=ABBR[e.cat]||'他';
+  const stCls=STATUS_CLS[e.status]||'tag-plan';
+  const stLbl=STATUS_LABEL[e.status]||'予定';
+  const dateLbl=e.date?formatDateShort(e.date):'';
+  return `<div class="kb-row">
+    <div class="kb-row-ic" style="background:${bg};color:${col};">${ab}</div>
+    <div class="kb-row-info">
+      <div class="kb-row-desc">${e.desc}</div>
+      <div class="kb-row-meta">
+        <span class="kb-row-cat">${e.cat}</span>
+        ${dateLbl?`<span class="kb-row-date">${dateLbl}</span>`:''}
+        <span class="kb-status-tag ${stCls}" onclick="toggleStatus(${e.id})" style="cursor:pointer;">${stLbl}</span>
       </div>
-      <div class="kb-row-r">
-        <span class="${isIn?'kb-row-ain':'kb-row-aex'}">${isIn?'+':'-'}${fmt(e.amount)}</span>
-        <button class="kb-del" onclick="delEntry(${e.id})">×</button>
-      </div>
+    </div>
+    <div class="kb-row-r">
+      <span class="${isIn?'kb-row-ain':'kb-row-aex'}">${isIn?'+':'-'}${fmt(e.amount)}</span>
+      <button class="kb-del" onclick="delEntry(${e.id})">×</button>
+    </div>
+  </div>`;
+}
+
+function formatDateShort(dstr){
+  const d=parseLocalDate(dstr);
+  return (d.getMonth()+1)+'/'+d.getDate();
+}
+
+function parseLocalDate(dstr){
+  const [y,m,d]=dstr.split('-').map(Number);
+  return new Date(y,m-1,d);
+}
+
+function pad(n){return String(n).padStart(2,'0');}
+function dateKey(y,m,d){return y+'-'+pad(m+1)+'-'+pad(d);}
+
+function calShift(delta){
+  calMonth+=delta;
+  if(calMonth<0){calMonth=11;calYear--;}
+  if(calMonth>11){calMonth=0;calYear++;}
+  renderCalendar();
+}
+
+function calGoToday(){
+  const now=new Date();
+  calYear=now.getFullYear();
+  calMonth=now.getMonth();
+  selectedDate=todayStr();
+  renderCalendar();
+}
+
+function renderCalendar(){
+  if(calYear===undefined){
+    const now=new Date();
+    calYear=now.getFullYear();
+    calMonth=now.getMonth();
+    selectedDate=todayStr();
+  }
+  document.getElementById('cal-title').textContent=calYear+'年 '+(calMonth+1)+'月';
+
+  const dowEl=document.getElementById('cal-dow');
+  dowEl.innerHTML=DOW.map((d,i)=>`<div class="kb-cal-dow ${i===0?'sun':i===6?'sat':''}">${d}</div>`).join('');
+
+  const firstDow=new Date(calYear,calMonth,1).getDay();
+  const daysInMonth=new Date(calYear,calMonth+1,0).getDate();
+  const todayK=todayStr();
+
+  // 月間合計（取消を除く）
+  const monthPrefix=calYear+'-'+pad(calMonth+1)+'-';
+  let monthIn=0,monthEx=0;
+  entries.forEach(e=>{
+    if(!e.date||!e.date.startsWith(monthPrefix)||e.status==='cancel')return;
+    if(e.type==='income')monthIn+=e.amount;
+    else monthEx+=e.amount;
+  });
+  const monthBal=monthIn-monthEx;
+  document.getElementById('cal-m-in').textContent=fmt(monthIn);
+  document.getElementById('cal-m-ex').textContent=fmt(monthEx);
+  const calBalEl=document.getElementById('cal-m-bal');
+  calBalEl.textContent=fmt(Math.abs(monthBal));
+  calBalEl.className='kb-stat-v '+(monthBal>=0?'c-bp':'c-bn');
+
+  // 日別集計
+  const byDay={};
+  entries.forEach(e=>{
+    if(!e.date)return;
+    if(!byDay[e.date])byDay[e.date]={in:0,ex:0,inPlan:false,exPlan:false};
+    const b=byDay[e.date];
+    if(e.status==='cancel')return;
+    if(e.type==='income'){b.in+=e.amount;if(e.status==='plan')b.inPlan=true;}
+    else{b.ex+=e.amount;if(e.status==='plan')b.exPlan=true;}
+  });
+
+  let cells='';
+  for(let i=0;i<firstDow;i++)cells+='<div class="kb-cal-cell empty"></div>';
+  for(let d=1;d<=daysInMonth;d++){
+    const k=dateKey(calYear,calMonth,d);
+    const b=byDay[k];
+    const isToday=k===todayK;
+    const isSel=k===selectedDate;
+    let dotsHtml='';
+    let amtHtml='';
+    if(b){
+      const dots=[];
+      if(b.in>0)dots.push(`<span class="kb-cal-dot in${b.inPlan?' plan':''}"></span>`);
+      if(b.ex>0)dots.push(`<span class="kb-cal-dot ex${b.exPlan?' plan':''}"></span>`);
+      dotsHtml=`<div class="kb-cal-dots">${dots.join('')}</div>`;
+      const amtParts=[];
+      if(b.in>0)amtParts.push(`<div class="kb-cal-amt in">+${fmtShort(b.in)}</div>`);
+      if(b.ex>0)amtParts.push(`<div class="kb-cal-amt ex">-${fmtShort(b.ex)}</div>`);
+      amtHtml=amtParts.join('');
+    }
+    cells+=`<div class="kb-cal-cell${isToday?' today':''}${isSel?' selected':''}" onclick="selectDay('${k}')">
+      <div class="kb-cal-daynum">${d}</div>
+      ${amtHtml}
+      ${dotsHtml}
     </div>`;
-  }).join('');
+  }
+  document.getElementById('cal-grid').innerHTML=cells;
+
+  renderDayDetail();
+}
+
+function selectDay(k){
+  selectedDate=k;
+  renderCalendar();
+}
+
+function renderDayDetail(){
+  const d=parseLocalDate(selectedDate);
+  document.getElementById('day-title').textContent=(d.getMonth()+1)+'月'+d.getDate()+'日（'+DOW[d.getDay()]+'）';
+  const dayEntries=entries.filter(e=>e.date===selectedDate);
+  const inSum=dayEntries.filter(e=>e.type==='income'&&e.status!=='cancel').reduce((s,e)=>s+e.amount,0);
+  const exSum=dayEntries.filter(e=>e.type==='expense'&&e.status!=='cancel').reduce((s,e)=>s+e.amount,0);
+  document.getElementById('day-in').textContent='+'+fmt(inSum);
+  document.getElementById('day-ex').textContent='-'+fmt(exSum);
+  const listEl=document.getElementById('day-list');
+  if(!dayEntries.length){
+    listEl.innerHTML='<div class="kb-empty">この日の記録はありません</div>';
+    return;
+  }
+  const sorted=[...dayEntries].sort((a,b)=>a.id-b.id).reverse();
+  listEl.innerHTML=sorted.map(e=>rowHtml(e)).join('');
 }
 
 function render(){
   const d=new Date();
   document.getElementById('kb-date').textContent=d.getFullYear()+'年'+(d.getMonth()+1)+'月';
-  const inc=entries.filter(e=>e.type==='income').reduce((s,e)=>s+e.amount,0);
-  const exp=entries.filter(e=>e.type==='expense').reduce((s,e)=>s+e.amount,0);
+  const inc=entries.filter(e=>e.type==='income'&&e.status!=='cancel').reduce((s,e)=>s+e.amount,0);
+  const exp=entries.filter(e=>e.type==='expense'&&e.status!=='cancel').reduce((s,e)=>s+e.amount,0);
   const bal=inc-exp;
   document.getElementById('s-in').textContent=fmt(inc);
   document.getElementById('s-ex').textContent=fmt(exp);
@@ -381,8 +613,14 @@ function render(){
   makeCats('income','in-cats','in-chart-wrap','in-legend','in-chart');
   makeCats('expense','ex-cats','ex-chart-wrap','ex-legend','ex-chart');
   renderList();
+  if(document.getElementById('panel-calendar').classList.contains('on'))renderCalendar();
 }
 
-loadData();
-render();
+document.getElementById('in-date').value=todayStr();
+document.getElementById('ex-date').value=todayStr();
+
+(async function init(){
+  await loadData();
+  render();
+})();
 </script>
