@@ -312,6 +312,49 @@ const STATUS_LABEL={plan:'予定',done:'完了',cancel:'取消'};
 const STATUS_CLS={plan:'tag-plan',done:'tag-done',cancel:'tag-cancel'};
 const DOW=['日','月','火','水','木','金','土'];
 
+// Claude上のプレビューでは window.storage（クラウド保存）を使い、
+// ダウンロードして直接ブラウザで開いた場合は localStorage を使う。
+const hasCloudStorage=(typeof window.storage!=='undefined'&&window.storage!==null);
+
+async function storageGet(key){
+  let cloudResult=null;
+  if(hasCloudStorage){
+    try{
+      cloudResult=await window.storage.get(key);
+    }catch(e){
+      cloudResult=null;
+    }
+  }
+  if(cloudResult&&cloudResult.value)return cloudResult;
+  // クラウド側に値がない場合はブラウザのローカル保存を試す
+  try{
+    const v=localStorage.getItem(key);
+    return v!==null?{key,value:v}:null;
+  }catch(e){
+    return null;
+  }
+}
+
+async function storageSet(key,value){
+  let cloudOk=false;
+  if(hasCloudStorage){
+    try{
+      const r=await window.storage.set(key,value);
+      cloudOk=!!r;
+    }catch(e){
+      console.error('Cloud storage error:',e);
+    }
+  }
+  let localOk=false;
+  try{
+    localStorage.setItem(key,value);
+    localOk=true;
+  }catch(e){
+    // サンドボックス環境ではアクセスが拒否されることがあるが、その場合はクラウド保存のみで続行
+  }
+  return (cloudOk||localOk)?{key,value}:null;
+}
+
 let entries=[];
 let nid=1;
 let charts={};
@@ -372,7 +415,7 @@ async function handleIconFile(input){
   try{
     const dataUrl=await resizeImageToDataURL(file,192);
     applyAppIcon(dataUrl);
-    const result=await window.storage.set(ICON_STORAGE_KEY,dataUrl);
+    const result=await storageSet(ICON_STORAGE_KEY,dataUrl);
     if(!result)console.error('アイコンの保存に失敗しました');
   }catch(e){
     console.error('アイコン設定エラー:',e);
@@ -381,7 +424,7 @@ async function handleIconFile(input){
 
 async function loadAppIcon(){
   try{
-    const res=await window.storage.get(ICON_STORAGE_KEY);
+    const res=await storageGet(ICON_STORAGE_KEY);
     if(res&&res.value)applyAppIcon(res.value);
   }catch(e){
     // 未設定の場合はデフォルトアイコンのまま
@@ -392,7 +435,7 @@ let calYear, calMonth, selectedDate;
 
 async function loadData(){
   try{
-    const res=await window.storage.get(STORAGE_KEY);
+    const res=await storageGet(STORAGE_KEY);
     if(res&&res.value){
       const p=JSON.parse(res.value);
       entries=p.entries||[];
@@ -407,7 +450,7 @@ async function loadData(){
 
 async function saveData(){
   try{
-    const result=await window.storage.set(STORAGE_KEY,JSON.stringify({entries,nid}));
+    const result=await storageSet(STORAGE_KEY,JSON.stringify({entries,nid}));
     if(!result){console.error('保存に失敗しました');return;}
     const msg=document.getElementById('save-msg');
     msg.classList.add('show');
