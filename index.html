@@ -1,4 +1,3 @@
-<!-- 家計簿コード -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,'Hiragino Sans','Hiragino Kaku Gothic ProN','Noto Sans JP','Yu Gothic UI',sans-serif;}
@@ -7,7 +6,13 @@
 
 .kb-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;}
 .kb-brand{display:flex;align-items:center;gap:10px;}
-.kb-icon{width:36px;height:36px;background:#1D9E75;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.kb-icon{width:36px;height:36px;background:#1D9E75;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;cursor:pointer;-webkit-tap-highlight-color:transparent;overflow:hidden;}
+.kb-icon img{width:100%;height:100%;object-fit:cover;display:none;}
+.kb-icon.has-custom svg{display:none;}
+.kb-icon.has-custom img{display:block;}
+.kb-icon-input{position:absolute;width:0;height:0;opacity:0;overflow:hidden;}
+.kb-icon-badge{position:absolute;bottom:-3px;right:-3px;width:15px;height:15px;background:var(--color-background-primary);border:1.5px solid var(--color-background-primary);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;box-shadow:0 0 0 1px var(--color-border-secondary);}
+.kb-icon-hint{font-size:11px;color:var(--color-text-tertiary);margin:-1rem 0 1.1rem;line-height:1.6;}
 .kb-icon svg{width:19px;height:19px;}
 .kb-name{font-size:18px;font-weight:500;color:var(--color-text-primary);}
 .kb-pill{font-size:13px;color:var(--color-text-secondary);background:var(--color-background-secondary);border:1px solid var(--color-border-secondary);border-radius:99px;padding:5px 14px;}
@@ -148,17 +153,21 @@ button.kb-submit.ex:active{background:#993C1D;}
 <div class="kb">
   <div class="kb-header">
     <div class="kb-brand">
-      <div class="kb-icon">
+      <label class="kb-icon" id="app-icon" for="app-icon-input">
         <svg viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect x="1" y="10" width="3.5" height="6" rx="1.2" fill="white" opacity=".65"/>
           <rect x="6.5" y="6" width="3.5" height="10" rx="1.2" fill="white" opacity=".82"/>
           <rect x="12" y="2" width="3.5" height="14" rx="1.2" fill="white"/>
         </svg>
-      </div>
+        <img id="app-icon-img" alt=""/>
+        <span class="kb-icon-badge">✎</span>
+        <input class="kb-icon-input" type="file" id="app-icon-input" accept="image/*" onchange="handleIconFile(this)"/>
+      </label>
       <span class="kb-name">家計簿</span>
     </div>
     <span class="kb-pill" id="kb-date"></span>
   </div>
+  <div class="kb-icon-hint">アイコンをタップして写真を選ぶと、ホーム画面追加時のアイコンになります</div>
 
   <div class="kb-summary">
     <div class="kb-stat"><div class="kb-stat-l">収入</div><div class="kb-stat-v c-in" id="s-in">¥0</div></div>
@@ -295,6 +304,7 @@ button.kb-submit.ex:active{background:#993C1D;}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
 const STORAGE_KEY='kakeibo_entries_v3';
+const ICON_STORAGE_KEY='kakeibo_app_icon_v1';
 const CC={'給与':'#1D9E75','副業':'#5DCAA5','ボーナス':'#9FE1CB','食費':'#D85A30','交通費':'#EF9F27','光熱費':'#E24B4A','住居費':'#378ADD','娯楽':'#7F77DD','医療':'#D4537E','その他':'#888780'};
 const CB={'給与':'#E1F5EE','副業':'#E1F5EE','ボーナス':'#E1F5EE','食費':'#FAECE7','交通費':'#FAEEDA','光熱費':'#FCEBEB','住居費':'#E6F1FB','娯楽':'#EEEDFE','医療':'#FBEAF0','その他':'#F1EFE8'};
 const ABBR={'給与':'給','副業':'副','ボーナス':'賞','食費':'食','交通費':'交','光熱費':'光','住居費':'住','娯楽':'楽','医療':'医','その他':'他'};
@@ -312,6 +322,70 @@ let currentFilter='all';
 function todayStr(){
   const d=new Date();
   return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
+function resizeImageToDataURL(file,size=192){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const img=new Image();
+      img.onload=()=>{
+        const canvas=document.createElement('canvas');
+        canvas.width=size;canvas.height=size;
+        const ctx=canvas.getContext('2d');
+        const scale=Math.max(size/img.width,size/img.height);
+        const w=img.width*scale,h=img.height*scale;
+        ctx.drawImage(img,(size-w)/2,(size-h)/2,w,h);
+        resolve(canvas.toDataURL('image/png'));
+      };
+      img.onerror=()=>reject(new Error('画像の読み込みに失敗しました'));
+      img.src=e.target.result;
+    };
+    reader.onerror=()=>reject(new Error('ファイルの読み込みに失敗しました'));
+    reader.readAsDataURL(file);
+  });
+}
+
+function setLinkTag(rel,href){
+  let link=document.querySelector(`link[rel="${rel}"]`);
+  if(!link){
+    link=document.createElement('link');
+    link.rel=rel;
+    document.head.appendChild(link);
+  }
+  link.href=href;
+}
+
+function applyAppIcon(dataUrl){
+  document.getElementById('app-icon-img').src=dataUrl;
+  document.getElementById('app-icon').classList.add('has-custom');
+  setLinkTag('apple-touch-icon',dataUrl);
+  setLinkTag('icon',dataUrl);
+  const manifest={name:'家計簿',short_name:'家計簿',icons:[{src:dataUrl,sizes:'192x192',type:'image/png'}],start_url:'.',display:'standalone'};
+  const blobUrl=URL.createObjectURL(new Blob([JSON.stringify(manifest)],{type:'application/json'}));
+  setLinkTag('manifest',blobUrl);
+}
+
+async function handleIconFile(input){
+  const file=input.files&&input.files[0];
+  if(!file)return;
+  try{
+    const dataUrl=await resizeImageToDataURL(file,192);
+    applyAppIcon(dataUrl);
+    const result=await window.storage.set(ICON_STORAGE_KEY,dataUrl);
+    if(!result)console.error('アイコンの保存に失敗しました');
+  }catch(e){
+    console.error('アイコン設定エラー:',e);
+  }
+}
+
+async function loadAppIcon(){
+  try{
+    const res=await window.storage.get(ICON_STORAGE_KEY);
+    if(res&&res.value)applyAppIcon(res.value);
+  }catch(e){
+    // 未設定の場合はデフォルトアイコンのまま
+  }
 }
 
 let calYear, calMonth, selectedDate;
@@ -623,5 +697,6 @@ document.getElementById('ex-date').value=todayStr();
 (async function init(){
   await loadData();
   render();
+  loadAppIcon();
 })();
 </script>
